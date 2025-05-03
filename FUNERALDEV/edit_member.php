@@ -79,10 +79,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <h2 class="text-center">Edit Member</h2>
 
 <?php if ($success): ?>
-    <div class="alert alert-success text-center"><?php echo $success; ?></div>
+    <div class="alert alert-success text-center" id="message"><?php echo $success; ?></div>
+    <script>
+        setTimeout(() => {
+            document.getElementById('message').style.display = 'none';
+            window.location.href = 'manage_members.php';
+        }, 3000); // 3 seconds
+    </script>
 <?php elseif ($error): ?>
-    <div class="alert alert-danger text-center"><?php echo $error; ?></div>
+    <div class="alert alert-danger text-center" id="message"><?php echo $error; ?></div>
+    <script>
+        setTimeout(() => {
+            document.getElementById('message').style.display = 'none';
+        }, 5000); // 5 seconds
+    </script>
 <?php endif; ?>
+
 
 <form method="POST" class="border p-4 shadow rounded">
     <div class="mb-3">

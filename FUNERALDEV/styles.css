@@ -1,7 +1,7 @@
 /* General styles */
 body {
     font-family: Arial, sans-serif;
-    background-color:white; /* Background image */
+    background-image: url('/FUNERALDEV/Images/background.jpg'); /* Background image */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -74,7 +74,7 @@ button:hover {
 }
 
 .navbar {
-    background-color: rgba(94, 165, 245, 0.699);
+    background-color:  #007bff;
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
@@ -145,7 +145,7 @@ button:hover {
 
 /* Footer container */
 .footer-container {
-    background-color:  rgba(94, 165, 245, 0.699); /* Dark blue, same as navbar */
+    background-color:   #007bff; /* Dark blue, same as navbar */
     color: black; /* Light text for contrast */
     display: flex;
     justify-content: space-around;

@@ -66,7 +66,7 @@ $result = $stmt->get_result();
 <body>
 <?php include 'navbar.php'; ?>
 
-<div class="container mt-5">
+<div class="container-fluid mt-5 px-5">
     <h2 class="text-center mb-4">My Contribution History</h2>
 
     <div class="table-container">

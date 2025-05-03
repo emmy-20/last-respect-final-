@@ -50,12 +50,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin_email = 'emilywambugha20@students.uonbi.ac.ke';
         $subject = "New Death Logged";
         $body = "
-            A new death has been logged.<br><br>
-            <strong>Name:</strong> " . ($is_registered ? 'Registered Member' : $deceased_name) . "<br>
-            <strong>Area:</strong> $area<br>
-            <strong>Deadline:</strong> $deadline<br>
-            <strong>Description:</strong><br>$description
-        ";
+    <p>Dear Member,</p>
+
+    <p>It is with deep sorrow that we inform you of the passing of a beloved member of our community.</p>
+
+    <p>
+        <strong>Deceased:</strong> " . ($is_registered ? 'Registered Member' : htmlspecialchars($deceased_name)) . "<br>
+        <strong>Area:</strong> " . htmlspecialchars($area) . "<br>
+        <strong>Date of Death:</strong> " . htmlspecialchars($date_of_death) . "<br>
+        <strong>Burial/Contribution Deadline:</strong> " . htmlspecialchars($deadline) . "
+    </p>
+
+    <p>
+        In times like these, our strength lies in our unity. We kindly appeal to your generosity to stand with the affected family 
+        through your support — no contribution is ever too small. Together, we can ease their burden and show that they are not alone.
+    </p>
+
+    <p>
+        May we continue to uphold the values of empathy, community, and solidarity that define us.
+    </p>
+
+    <p>
+        Warm regards,<br>
+        <strong>Last Respect FundDrive Team</strong>
+    </p>
+";
+
         sendEmail($admin_email, $subject, $body);
 
         // TODO: Trigger dashboard notification here
@@ -115,10 +135,11 @@ function sendEmail($to, $subject, $message) {
 <h2>Log a Death (Admin)</h2>
 
 <?php if ($success): ?>
-    <div class="alert-message success"><?php echo $success; ?></div>
+    <div class="alert alert-success" id="alert-message"><?php echo $success; ?></div>
 <?php elseif ($error): ?>
-    <div class="alert-message error"><?php echo $error; ?></div>
+    <div class="alert alert-danger" id="alert-message"><?php echo $error; ?></div>
 <?php endif; ?>
+
 
 <form method="POST">
     <label>
@@ -173,16 +194,19 @@ function sendEmail($to, $subject, $message) {
 
 
 <script>
-    // Set initial state on page load
-    window.onload = toggleDeceasedSection;
+    window.onload = function () {
+        toggleDeceasedSection();
 
-    setTimeout(() => {
-        const alert = document.querySelector('.alert-message');
+        const alert = document.getElementById('alert-message');
         if (alert) {
-            alert.style.opacity = '0';
-            setTimeout(() => alert.remove(), 500);
+            setTimeout(() => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }, 4000); // wait 4s before fading out
         }
-    }, 5000);
+    };
 </script>
+
 </body>
 </html>

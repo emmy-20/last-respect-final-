@@ -43,7 +43,7 @@ $deaths = $conn->query("SELECT id, deceased_name FROM deaths ORDER BY created_at
                         <th>Deceased Name</th>
                         <th>Total Collected (KES)</th>
                         <th>Number of Contributors</th>
-                        <th>Expenses Details</th>
+                        <th>Expense Details</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,27 +58,15 @@ $deaths = $conn->query("SELECT id, deceased_name FROM deaths ORDER BY created_at
                     $stmt->bind_result($total_collected, $contributors_count);
                     $stmt->fetch();
                     $stmt->close();
-
-                    // Fetch expenses
-                    $expenses = $conn->prepare("SELECT description, amount FROM funeral_expenses WHERE death_id = ?");
-                    $expenses->bind_param("i", $death_id);
-                    $expenses->execute();
-                    $expenses_result = $expenses->get_result();
                 ?>
                     <tr>
                         <td><?php echo $death_name; ?></td>
                         <td class="text-end"><?php echo number_format($total_collected ?? 0, 2); ?></td>
                         <td class="text-center"><?php echo $contributors_count ?? 0; ?></td>
-                        <td>
-                            <?php if ($expenses_result->num_rows > 0): ?>
-                                <ul class="mb-0">
-                                    <?php while ($expense = $expenses_result->fetch_assoc()): ?>
-                                        <li><?php echo htmlspecialchars($expense['description']); ?>: KES <?php echo number_format($expense['amount'], 2); ?></li>
-                                    <?php endwhile; ?>
-                                </ul>
-                            <?php else: ?>
-                                <span class="text-muted">No expenses recorded</span>
-                            <?php endif; ?>
+                        <td class="text-center">
+                            <a href="view_expenses.php?death_id=<?php echo $death_id; ?>" class="btn btn-outline-info btn-sm">
+                                View Expenses
+                            </a>
                         </td>
                     </tr>
                 <?php endwhile; ?>

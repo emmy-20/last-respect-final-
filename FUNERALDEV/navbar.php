@@ -21,7 +21,8 @@ if (session_status() === PHP_SESSION_NONE) {
     <ul class="nav-list">
         <img class="logo" src="images/logo.jpg" alt="Logo">
 
-        <li><a href="index.php">Home</a></li>
+        <li><a href="<?php echo ($_SESSION['role'] ?? '') === 'admin' ? 'admin_dashboard.php' : 'index.php'; ?>">Home</a>
+        </li>
         <li><a href="logout.php">Logout</a></li>
 
         <?php if (!isset($_SESSION['user_id'])): ?>
@@ -30,17 +31,21 @@ if (session_status() === PHP_SESSION_NONE) {
     </ul>
 
     <?php if (isset($_SESSION['full_name'])): ?>
-        <?php
-        $defaultPhoto = 'images/default_user.png'; // Make sure this file exists
-        $profilePhoto = (!empty($_SESSION['profile_photo']) && file_exists($_SESSION['profile_photo']))
-            ? $_SESSION['profile_photo']
-            : $defaultPhoto;
-        ?>
-        <div class="user-info">
-            <img src="<?php echo htmlspecialchars($profilePhoto); ?>" alt="Profile Photo" class="user-photo">
-            <span>Welcome, <strong><?php echo htmlspecialchars($_SESSION['full_name']); ?></strong></span>
-        </div>
-    <?php endif; ?>
+    <?php
+    $defaultPhoto = 'images/default_user.png'; // Make sure this file exists
+    $profilePhoto = (!empty($_SESSION['profile_photo']) && file_exists($_SESSION['profile_photo']))
+        ? $_SESSION['profile_photo']
+        : $defaultPhoto;
+    $role = $_SESSION['role'] ?? 'member'; // default role fallback
+    ?>
+    <div class="user-info">
+        <img src="<?php echo htmlspecialchars($profilePhoto); ?>" alt="Profile Photo" class="user-photo">
+        <span>Welcome, <strong><?php echo htmlspecialchars($_SESSION['full_name']); ?></strong></span>
+        <br>
+        <span class="user-role">(<?php echo htmlspecialchars(ucfirst($role)); ?>)</span>
+    </div>
+<?php endif; ?>
+
 </nav>
 
 </body>

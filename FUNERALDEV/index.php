@@ -11,6 +11,7 @@ include 'db_connect.php'; // Connect to the database
     <title>Last Respect FundDrive Platform</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+    
     .dashboard-container {
         display: flex;
         flex-wrap: wrap;

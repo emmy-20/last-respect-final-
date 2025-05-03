@@ -7,13 +7,26 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit;
 }
-
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Defaulters List</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f8f8f8;
+        }
+    </style>
 </head>
 <body>
 <?php include 'navbar.php'; ?>
@@ -36,35 +49,22 @@ while ($death = $deaths_result->fetch_assoc()):
 
     echo "<h3>Defaulters for: <u>$deceased_name</u> (Deadline: $deadline)</h3>";
 
-    // Get IDs of users who have contributed for this death
-    $contrib_result = $conn->prepare("SELECT user_id FROM contributions WHERE death_id = ?");
-    $contrib_result->bind_param("i", $death_id);
-    $contrib_result->execute();
-    $contrib_result->bind_result($contributed_user_id);
-
-    $contributors = [];
-    while ($contrib_result->fetch()) {
-        $contributors[] = $contributed_user_id;
-    }
-    $contrib_result->close();
-
-    // Get all members who are NOT in the contributors list
-    if (!empty($contributors)) {
-        $placeholders = implode(',', array_fill(0, count($contributors), '?'));
-        $types = str_repeat('i', count($contributors));
-        $query = "SELECT id, full_name, id_number, phone_number FROM users WHERE role = 'member' AND id NOT IN ($placeholders)";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param($types, ...$contributors);
-    } else {
-        // No one has contributed yet
-        $stmt = $conn->prepare("SELECT id, full_name, id_number, phone_number FROM users WHERE role = 'member'");
-    }
-
+    // Get members who have NOT contributed to this death using LEFT JOIN
+    $query = "
+        SELECT u.full_name, u.id_number, u.phone_number
+        FROM users u
+        LEFT JOIN (
+            SELECT user_id FROM contributions WHERE death_id = ?
+        ) c ON u.id = c.user_id
+        WHERE u.role = 'member' AND c.user_id IS NULL
+    ";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $death_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0): ?>
-        <table border="1">
+        <table>
             <thead>
                 <tr>
                     <th>Member Name</th>
@@ -85,11 +85,13 @@ while ($death = $deaths_result->fetch_assoc()):
             </tbody>
         </table>
     <?php else: ?>
-        <p style="color:green;">All members have contributed ✅</p>
+        <p style="color:green;">All members have contributed </p>
     <?php endif;
 
     $stmt->close();
 endwhile;
+
+$conn->close();
 ?>
 
 </body>

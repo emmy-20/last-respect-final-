@@ -54,10 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Register New Member</h2>
     
     <?php if ($success): ?>
-        <p style="color: green;"><?php echo $success; ?></p>
-    <?php elseif ($error): ?>
-        <p style="color: red;"><?php echo $error; ?></p>
-    <?php endif; ?>
+    <p style="color: green;"><?php echo $success; ?></p>
+<?php elseif ($error): ?>
+    <p id="error-message" style="color: red;"><?php echo $error; ?></p>
+<?php endif; ?>
+ 
 
     <form method="POST" action="">
         <label>Full Name:</label><br>
@@ -94,5 +95,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit">Register Member</button>
     </form>
+    <?php if ($success): ?>
+<script>
+    // Hide the message and redirect after 3 seconds
+    setTimeout(function () {
+        window.location.href = 'manage_members.php';
+    }, 3000);
+</script>
+<?php endif; ?>
+
+<?php if ($error): ?>
+<script>
+    // Hide the error message after 5 seconds
+    setTimeout(function () {
+        const errorMsg = document.getElementById('error-message');
+        if (errorMsg) errorMsg.style.display = 'none';
+    }, 5000);
+</script>
+<?php endif; ?>
+
 </body>
 </html>

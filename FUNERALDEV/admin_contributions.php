@@ -67,10 +67,20 @@ $deaths = $conn->query("SELECT id, deceased_name, created_at FROM deaths ORDER B
 <div class="container-fluid my-4 px-4">
     <h2 class="mb-4">Admin Dashboard - Track Member Contributions</h2>
 
-    <form method="GET" class="mb-4 d-flex" style="max-width: 500px;">
-        <input type="text" name="search_id" class="form-control me-2" placeholder="Search by ID Number" value="<?php echo htmlspecialchars($search_id); ?>">
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
+    <form method="GET" class="mb-4 row g-2" style="max-width: 800px;">
+    <div class="col-md-4">
+        <input type="text" name="search_id" class="form-control" placeholder="Search by ID Number" value="<?php echo htmlspecialchars($_GET['search_id'] ?? ''); ?>">
+    </div>
+    <div class="col-md-4">
+        <input type="text" name="search_deceased" class="form-control" placeholder="Search by Deceased Name" value="<?php echo htmlspecialchars($_GET['search_deceased'] ?? ''); ?>">
+    </div>
+    <div class="col-md-3">
+        <input type="date" name="search_date" class="form-control" value="<?php echo htmlspecialchars($_GET['search_date'] ?? ''); ?>">
+    </div>
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+</form>
 
     <a href="defaulters_all.php" class="btn btn-outline-danger mb-4">View All Defaulters</a>
 
@@ -131,8 +141,12 @@ $deaths = $conn->query("SELECT id, deceased_name, created_at FROM deaths ORDER B
                             <td><?php echo htmlspecialchars($row['id_number']); ?></td>
                             <td class="text-end"><?php echo $row['amount'] ? number_format($row['amount'], 2) : '0.00'; ?></td>
                             <td class="text-center">
-    <span class="badge bg-<?php echo $is_paid ? 'success' : 'warning'; ?>">
-        <?php echo $row['status'] ?? 'Not Paid'; ?>
+    <?php
+        $status_text = ($row['status'] === 'paid') ? 'Paid' : 'Not Paid';
+        $badge_class = ($row['status'] === 'paid') ? 'success' : 'warning';
+    ?>
+    <span class="badge bg-<?php echo $badge_class; ?>">
+        <?php echo $status_text; ?>
     </span>
 </td>
                             <td class="text-center"><?php echo $row['payment_method'] ?? '-'; ?></td>
@@ -143,9 +157,10 @@ $deaths = $conn->query("SELECT id, deceased_name, created_at FROM deaths ORDER B
                 </table>
             </div>
 
-            <a href="defaulters.php?death_id=<?php echo $death_id; ?>" class="btn btn-outline-secondary">
-                View Defaulters for <?php echo $death_name; ?>
-            </a>
+            <a href="log_expense.php?death_id=<?php echo $death_id; ?>" class="btn btn-outline-primary ms-2">
+    Log Expense for <?php echo $death_name; ?>
+</a>
+
         </div>
     <?php endwhile; ?>
 </div>

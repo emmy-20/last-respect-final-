@@ -2,6 +2,16 @@
 include 'db_connect.php';
 date_default_timezone_set('Africa/Nairobi');
 
+// ✅ Retrieve user_id and death_id from the form
+session_start(); // Required if not already called
+$user_id = $_SESSION['user_id'] ?? null;
+$death_id = $_POST['death_id'] ?? null;
+
+if (!$user_id || !$death_id) {
+    die("Missing user or death ID.");
+}
+
+
 // Fetch phone and marital status from the form
 $raw_phone = $_POST['phone']; // e.g., 0712345678
 $PartyA = preg_replace('/^0/', '254', $raw_phone); // Convert 07... to 2547... // Phone number
@@ -171,23 +181,24 @@ echo "<br><strong>Fallback Check:</strong> ";
 
 // Optional: Update contributions table if payment is successful
 if ($resultCode === "0") {
-    $update_contrib = $conn->prepare("UPDATE contributions SET status = 'paid' WHERE phone_number = ? AND amount = ? AND status = 'pending'");
-    $update_contrib->bind_param("sd", $phone, $amount);
+    $update_contrib = $conn->prepare("
+    UPDATE contributions 
+    SET status = 'paid', 
+        payment_method = 'MPESA', 
+        amount = ?
+    WHERE user_id = ? AND death_id = ? AND status = 'pending'
+");
+$update_contrib->bind_param("dii", $Amount, $user_id, $death_id);
     $update_contrib->execute();
     $update_contrib->close();
 }
+if ($resultCode === "0") {
+    session_start();
+    $_SESSION['thankyou_message'] = "Your payment was successful. Thank you for your contribution.";
+    header("Location: thankyou.php?death_id=" . urlencode($death_id));
+    exit;
+}
 
-// if ($resultCode === "0") {
-//     echo "Payment Successful - $resultDesc (Code: $resultCode)";
-// } elseif ($resultCode === "1032") {
-//     echo " Payment Cancelled by User (Code: $resultCode)";
-// } elseif ($resultCode === "2001") {
-//     echo "Payment Failed - Invalid Initiator Info (Code: $resultCode)";
-// } elseif ($resultCode === "UNKNOWN") {
-//     echo " Payment Status Unknown - No valid response received from Safaricom.";
-// } else {
-//     echo "Payment Failed or Still Pending - $resultDesc (Code: $resultCode)";
-// }
 
     
         // Match contribution by phone number and status 'pending'
